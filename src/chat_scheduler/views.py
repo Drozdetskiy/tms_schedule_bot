@@ -2,6 +2,7 @@
 import logging
 import time
 from dataclasses import asdict
+from typing import Any
 
 from django.conf import settings
 from rest_framework import status
@@ -15,9 +16,18 @@ __all__ = (
 from rest_framework.views import APIView
 
 from chat_scheduler.serializers import ChatSerializer
+from chat_scheduler.telegram_logic.callbacks import event_success_callback
 from chat_scheduler.telegram_logic.message import Message
 
 logger = logging.getLogger(f"{settings.PROJECT}")
+
+
+class CreateCallbackMixin:
+    success_callback: Any = None
+
+    def perform_create(self, serializer):
+        super().perform_create(serializer)
+        self.success_callback(serializer.data)
 
 
 class TelegramPostMixin:
@@ -30,8 +40,9 @@ class TelegramPostMixin:
         return Response(status=status.HTTP_200_OK)
 
 
-class MessageView(TelegramPostMixin, CreateAPIView):
+class MessageView(TelegramPostMixin, CreateCallbackMixin, CreateAPIView):
     serializer_class = ChatSerializer
+    success_callback = staticmethod(event_success_callback)
 
     def create(self, request, *args, **kwargs):
         message = Message(request.data)
