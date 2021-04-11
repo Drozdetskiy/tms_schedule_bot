@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 # Standard Library
 import os
 
+# TODO: add django settings libs
 PROJECT = "TMS_SCHEDULE_BOT"
 # Build paths inside the project like this: BASE_DIR / "subdir".
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -34,6 +35,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "django_celery_beat",
     "chat_scheduler",
 ]
 
@@ -95,11 +97,42 @@ DATABASES = {
 # Workers
 EVENT_WORKER_TIMEOUT = 5  # 5 sec
 
+ENABLE_MESSAGE_CALLBACK = True
+
 # Telegram
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN", "")
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
+
+# CELERY
+
+BROKER_SCHEMA = "redis"
+BROKER_HOST = "localhost"
+BROKER_PORT = "6379"
+BROKER_DB = "0"
+BROKER_URL = "{schema}://{host}:{port}/{db}".format(
+        schema=BROKER_SCHEMA,
+        host=BROKER_HOST,
+        port=BROKER_PORT,
+        db=BROKER_DB,
+    )
+
+CELERY_RESULT_SCHEMA = "redis"
+CELERY_RESULT_HOST = "localhost"
+CELERY_RESULT_PORT = "6379"
+CELERY_RESULT_DB = "0"
+CELERY_ALWAYS_EAGER = False
+CELERY_TASK_RESULT_EXPIRES = 10 * 60
+CELERY_MAX_CACHED_RESULTS = 10000
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+
+CELERY_RESULT_BACKEND = "{schema}://{host}:{port}/{db}".format(
+        schema=CELERY_RESULT_SCHEMA,
+        host=CELERY_RESULT_HOST,
+        port=CELERY_RESULT_PORT,
+        db=CELERY_RESULT_DB,
+    )
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -207,19 +240,5 @@ LOGGING = {
             ],
             "level": LOG_LEVEL,
         },
-        f"{PROJECT}.worker": {
-            "handlers": [
-                "console_handler", "worker_handler"
-            ],
-            "level": "ERROR",
-            "propagate": False,
-        },
-        f"{PROJECT}.event": {
-            "handlers": [
-                "console_handler", "event_handler"
-            ],
-            "level": LOG_LEVEL,
-            "propagate": False,
-        }
     },
 }

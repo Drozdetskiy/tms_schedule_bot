@@ -1,9 +1,10 @@
-# Third Party Library
+# Standard Library
 import logging
 import time
 from dataclasses import asdict
 from typing import Any
 
+# Third Party Library
 from django.conf import settings
 from rest_framework import status
 from rest_framework.generics import CreateAPIView
@@ -13,8 +14,10 @@ __all__ = (
     "MessageView",
 )
 
+# Third Party Library
 from rest_framework.views import APIView
 
+# Application Library
 from chat_scheduler.serializers import ChatSerializer
 from chat_scheduler.telegram_logic.callbacks import event_success_callback
 from chat_scheduler.telegram_logic.message import Message
@@ -27,7 +30,8 @@ class CreateCallbackMixin:
 
     def perform_create(self, serializer):
         super().perform_create(serializer)
-        self.success_callback(serializer.data)
+        if settings.ENABLE_MESSAGE_CALLBACK:
+            self.success_callback(serializer.data)
 
 
 class TelegramPostMixin:
@@ -35,8 +39,7 @@ class TelegramPostMixin:
         try:
             return super().post(request, *args, **kwargs)
         except Exception as exc:
-            print(exc)
-            logger.error(f"Error with message {request.data}")
+            logger.error(f"Error with message {request.data} with exc: {exc}")
         return Response(status=status.HTTP_200_OK)
 
 

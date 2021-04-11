@@ -1,6 +1,8 @@
+# Third Party Library
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
+# Application Library
 from chat_scheduler.models import Chat
 
 
