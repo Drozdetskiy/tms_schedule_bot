@@ -19,7 +19,7 @@ logger = logging.getLogger(settings.PROJECT)
 
 
 class SendMessageCommand:
-    def __init__(self, chat_pk, message_pk):
+    def __init__(self, chat_pk: int, message_pk: int):
         self.chat_pk = chat_pk
         self.message_pk = message_pk
 
