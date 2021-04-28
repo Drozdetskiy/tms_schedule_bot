@@ -134,6 +134,8 @@ CELERY_RESULT_BACKEND = "{schema}://{host}:{port}/{db}".format(
         db=CELERY_RESULT_DB,
     )
 
+DEFAULT_PERIODIC_TASK = "chat_scheduler.tasks.send_message"
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
