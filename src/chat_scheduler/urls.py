@@ -3,14 +3,13 @@ from django.urls import path
 
 # Application Library
 from chat_scheduler.views import (
-    CreateChatView,
-    Ping,
     ChatViewSet,
-    MessageViewSet,
+    CreateChatView,
     CronTabViewSet,
-    PeriodicTaskViewSet
+    MessageViewSet,
+    PeriodicTaskViewSet,
+    Ping,
 )
-
 
 crontab_list = CronTabViewSet.as_view({
     "get": "list",

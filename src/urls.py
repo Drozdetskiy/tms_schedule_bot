@@ -19,6 +19,7 @@ from django.urls import (
     include,
     path,
 )
+from rest_framework.authtoken import views
 
 # Application Library
 from chat_scheduler import urls as chat_scheduler_urls
@@ -29,4 +30,8 @@ urlpatterns = [
 
 urlpatterns += [
     path("", include(chat_scheduler_urls)),
+]
+
+urlpatterns += [
+    path("api-token-auth/", views.obtain_auth_token)
 ]

@@ -1,5 +1,4 @@
 # Third Party Library
-from django.conf import settings
 from django_celery_beat.models import (
     CrontabSchedule,
     PeriodicTask,
@@ -77,8 +76,9 @@ class CrontabSerializer(serializers.ModelSerializer):
 class PeriodicTaskSerializer(MessageSerializer):
     name = serializers.CharField(max_length=200)
     args = serializers.CharField()
-    crontab = CrontabSerializer()
+    crontab_id = serializers.IntegerField()
+    task = serializers.CharField(max_length=200)
 
     class Meta:
         model = PeriodicTask
-        fields = ("pk", "name", "crontab", "args")
+        fields = ("pk", "name", "task", "crontab_id", "args")

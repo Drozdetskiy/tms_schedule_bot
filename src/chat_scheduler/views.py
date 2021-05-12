@@ -11,30 +11,24 @@ from django_celery_beat.models import (
     PeriodicTask,
 )
 from rest_framework import status
-from rest_framework.generics import (
-    CreateAPIView,
-    ListAPIView,
-    RetrieveDestroyAPIView,
-    ListCreateAPIView,
-    RetrieveUpdateDestroyAPIView,
-)
-from rest_framework.mixins import UpdateModelMixin
+from rest_framework.generics import CreateAPIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-
-# Third Party Library
 from rest_framework.views import APIView
-
-# Application Library
 from rest_framework.viewsets import ModelViewSet
 
+# Application Library
+from chat_scheduler.models import (
+    Chat,
+    Message as MessageModel,
+)
 from chat_scheduler.serializers import (
-    CreateChatSerializer,
     ChatSerializer,
-    MessageSerializer,
+    CreateChatSerializer,
     CrontabSerializer,
+    MessageSerializer,
     PeriodicTaskSerializer,
 )
-from chat_scheduler.models import Chat, Message as MessageModel
 from chat_scheduler.telegram_logic.callbacks import event_success_callback
 from chat_scheduler.telegram_logic.message import Message
 
@@ -89,6 +83,8 @@ class CreateChatView(TelegramPostMixin, CreateCallbackMixin, CreateAPIView):
 
 
 class Ping(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request, *args, **kwargs):
         return Response(
             f"pong {time.time()}",
