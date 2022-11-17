@@ -34,10 +34,17 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "rest_framework.authtoken",
     "rest_framework",
     "django_celery_beat",
     "chat_scheduler",
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ]
+}
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -133,6 +140,8 @@ CELERY_RESULT_BACKEND = "{schema}://{host}:{port}/{db}".format(
         port=CELERY_RESULT_PORT,
         db=CELERY_RESULT_DB,
     )
+
+DEFAULT_PERIODIC_TASK = "chat_scheduler.tasks.send_message"
 
 AUTH_PASSWORD_VALIDATORS = [
     {

@@ -6,21 +6,40 @@ from typing import Any
 
 # Third Party Library
 from django.conf import settings
+from django_celery_beat.models import (
+    CrontabSchedule,
+    PeriodicTask,
+)
 from rest_framework import status
 from rest_framework.generics import CreateAPIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-
-__all__ = (
-    "MessageView",
-)
-
-# Third Party Library
 from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
 
 # Application Library
-from chat_scheduler.serializers import ChatSerializer
+from chat_scheduler.models import (
+    Chat,
+    Message as MessageModel,
+)
+from chat_scheduler.serializers import (
+    ChatSerializer,
+    CreateChatSerializer,
+    CrontabSerializer,
+    MessageSerializer,
+    PeriodicTaskSerializer,
+)
 from chat_scheduler.telegram_logic.callbacks import event_success_callback
 from chat_scheduler.telegram_logic.message import Message
+
+__all__ = (
+    "CreateChatView",
+    "Ping",
+    "ChatViewSet",
+    "MessageViewSet",
+    "CronTabViewSet",
+    "PeriodicTaskViewSet",
+)
 
 logger = logging.getLogger(f"{settings.PROJECT}")
 
@@ -43,8 +62,8 @@ class TelegramPostMixin:
         return Response(status=status.HTTP_200_OK)
 
 
-class MessageView(TelegramPostMixin, CreateCallbackMixin, CreateAPIView):
-    serializer_class = ChatSerializer
+class CreateChatView(TelegramPostMixin, CreateCallbackMixin, CreateAPIView):
+    serializer_class = CreateChatSerializer
     success_callback = staticmethod(event_success_callback)
 
     def create(self, request, *args, **kwargs):
@@ -64,8 +83,30 @@ class MessageView(TelegramPostMixin, CreateCallbackMixin, CreateAPIView):
 
 
 class Ping(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request, *args, **kwargs):
         return Response(
             f"pong {time.time()}",
             status=status.HTTP_200_OK,
         )
+
+
+class ChatViewSet(ModelViewSet):
+    serializer_class = ChatSerializer
+    queryset = Chat.objects.all()
+
+
+class MessageViewSet(ModelViewSet):
+    serializer_class = MessageSerializer
+    queryset = MessageModel.objects.all()
+
+
+class CronTabViewSet(ModelViewSet):
+    serializer_class = CrontabSerializer
+    queryset = CrontabSchedule.objects.all()
+
+
+class PeriodicTaskViewSet(ModelViewSet):
+    serializer_class = PeriodicTaskSerializer
+    queryset = PeriodicTask.objects.all()

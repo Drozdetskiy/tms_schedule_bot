@@ -12,6 +12,7 @@ from chat_scheduler.models import (
 class ChatAdmin(admin.ModelAdmin):
     list_display = (
         "chat_id",
+        "name",
         "pk",
         "created_at",
         "updated_at",
